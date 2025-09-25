@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HOPE IN HAVOC – Disaster Management | Edge Case Team (Abes)</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="brand">
+        <div class="title">HOPE IN HAVOC</div>
+        <div class="subtitle">Disaster Management • Edge Case Team (Abes)</div>
+      </div>
+      <nav class="nav-actions">
+        <button class="nav-btn" data-target="#overview">Overview</button>
+        <button class="nav-btn" data-target="#resources">Resources</button>
+        <button class="nav-btn" data-target="#contacts">Contacts</button>
+        <button class="nav-btn" data-target="#donations">Donations</button>
+        <button class="nav-btn" data-target="#volunteer">Volunteer</button>
+        <button class="nav-btn" data-target="#emergency-services">Emergency Services</button>
+      </nav>
+      <div class="config">
+        <button id="configToggle" aria-haspopup="true" aria-expanded="false" title="Configure APIs">⚙️</button>
+        <div id="configMenu" class="dropdown" hidden>
+          <form id="configForm">
+            <div class="field">
+              <label for="alertsApi">Alerts API URL</label>
+              <input type="url" id="alertsApi" name="alertsApi" placeholder="https://eonet.gsfc.nasa.gov/api/v3/events?status=open" />
+            </div>
+            <div class="field">
+              <label for="weatherApiKey">OpenWeather API Key</label>
+              <input type="text" id="weatherApiKey" name="weatherApiKey" placeholder="Enter OpenWeather key" />
+            </div>
+            <div class="field">
+              <label for="newsApiKey">GNews API Key</label>
+              <input type="text" id="newsApiKey" name="newsApiKey" placeholder="Enter GNews key" />
+            </div>
+            <div class="field">
+              <label for="tilesUrl">Map Tiles URL</label>
+              <input type="text" id="tilesUrl" name="tilesUrl" placeholder="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            </div>
+            <div class="actions">
+              <button type="submit" class="primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="overview" class="panel">
+        <h2>Overview</h2>
+        <p>Real-time situational awareness for disasters across India. Active alerts, weather, news, and resources at a glance.</p>
+        <div class="kpis">
+          <div class="kpi"><span id="kpiAlerts">0</span><label>Active Alerts (India)</label></div>
+          <div class="kpi"><span id="kpiCities">—</span><label>Weather City</label></div>
+          <div class="kpi"><span id="kpiArticles">0</span><label>News Articles</label></div>
+        </div>
+      </section>
+
+      <section id="alerts" class="panel">
+        <div class="panel-header">
+          <h2>Alerts</h2>
+          <div class="panel-tools">
+            <button id="refreshAlerts" class="secondary">Refresh</button>
+          </div>
+        </div>
+        <div id="alertsList" class="list"></div>
+      </section>
+
+      <section id="weather" class="panel">
+        <div class="panel-header">
+          <h2>Weather</h2>
+          <div class="panel-tools">
+            <form id="weatherForm" class="inline">
+              <input id="weatherCity" type="text" placeholder="City, CountryCode (e.g., Delhi, IN)" value="Delhi, IN" />
+              <button type="submit" class="secondary">Update</button>
+            </form>
+          </div>
+        </div>
+        <div id="weatherCurrent" class="weather"></div>
+      </section>
+
+      <section id="news" class="panel">
+        <div class="panel-header">
+          <h2>News</h2>
+          <div class="panel-tools">
+            <button id="refreshNews" class="secondary">Refresh</button>
+          </div>
+        </div>
+        <div id="newsList" class="list"></div>
+      </section>
+
+      <section id="resources" class="panel">
+        <h2>Resources</h2>
+        <ul>
+          <li><a href="https://www.ndma.gov.in/" target="_blank" rel="noopener">NDMA India</a></li>
+          <li><a href="https://ndrf.gov.in/" target="_blank" rel="noopener">NDRF</a></li>
+          <li><a href="https://imd.gov.in/" target="_blank" rel="noopener">India Meteorological Department</a></li>
+        </ul>
+      </section>
+
+      <section id="contacts" class="panel">
+        <h2>Contacts</h2>
+        <ul>
+          <li>Police: 100</li>
+          <li>Ambulance: 108</li>
+          <li>Fire: 101</li>
+          <li>Disaster Helpline: 1070 (State) / 011-26701728 (NDMA)</li>
+        </ul>
+      </section>
+
+      <section id="donations" class="panel">
+        <h2>Donations</h2>
+        <p>Support relief efforts via trusted organizations.</p>
+        <div class="donations">
+          <a class="donate" href="https://www.pmcares.gov.in/" target="_blank" rel="noopener">PM CARES Fund</a>
+          <a class="donate" href="https://www.redcross.org.in/" target="_blank" rel="noopener">Indian Red Cross</a>
+          <a class="donate" href="https://www.giveindia.org/" target="_blank" rel="noopener">GiveIndia</a>
+        </div>
+      </section>
+
+      <section id="volunteer" class="panel">
+        <h2>Volunteer</h2>
+        <form id="volunteerForm" class="stack">
+          <input required type="text" name="name" placeholder="Full Name" />
+          <input required type="tel" name="phone" placeholder="Phone" />
+          <input required type="text" name="location" placeholder="City / State" />
+          <select name="interest" required>
+            <option value="">Select Interest</option>
+            <option value="medical">Medical Aid</option>
+            <option value="logistics">Logistics</option>
+            <option value="shelter">Shelter Management</option>
+            <option value="food">Food & Water</option>
+          </select>
+          <button class="primary" type="submit">Submit</button>
+          <p id="volunteerThanks" class="muted" hidden>Thanks! We will reach out soon.</p>
+        </form>
+      </section>
+
+      <section id="emergency-services" class="panel">
+        <h2>Emergency Services</h2>
+        <ul>
+          <li>National Emergency Number: 112</li>
+          <li>NDMA Control Room: 011-26701728</li>
+          <li>Child Helpline: 1098</li>
+          <li>Women Helpline: 1091</li>
+        </ul>
+      </section>
+
+      <aside class="map-wrap">
+        <div id="map" aria-label="Map showing India alerts"></div>
+      </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <script src="/app.js"></script>
+  </body>
+  </html>
